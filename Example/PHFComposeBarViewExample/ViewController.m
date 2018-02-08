@@ -36,12 +36,8 @@ CGRect const kInitialViewFrame = { 0.0f, 0.0f, 320.0f, 480.0f };
                                                   object:nil];
 }
 
-- (NSUInteger)supportedInterfaceOrientations {
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskAll;
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
-    return YES;
 }
 
 - (void)loadView {
@@ -75,7 +71,7 @@ CGRect const kInitialViewFrame = { 0.0f, 0.0f, 320.0f, 480.0f };
     CGFloat widthChange  = (endFrame.origin.x - startFrame.origin.x) * signCorrection;
     CGFloat heightChange = (endFrame.origin.y - startFrame.origin.y) * signCorrection;
 
-    CGFloat sizeChange = UIInterfaceOrientationIsLandscape([self interfaceOrientation]) ? widthChange : heightChange;
+    CGFloat sizeChange = UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation]) ? widthChange : heightChange;
 
     CGRect newContainerFrame = [[self container] frame];
     newContainerFrame.size.height += sizeChange;
@@ -106,7 +102,7 @@ CGRect const kInitialViewFrame = { 0.0f, 0.0f, 320.0f, 480.0f };
               duration:(NSTimeInterval)duration
         animationCurve:(UIViewAnimationCurve)animationCurve
 {
-    [self prependTextToTextView:[NSString stringWithFormat:@"Height changing by %d", (NSInteger)(endFrame.size.height - startFrame.size.height)]];
+    [self prependTextToTextView:[NSString stringWithFormat:@"Height changing by %ld", (long)(endFrame.size.height - startFrame.size.height)]];
     UIEdgeInsets insets = UIEdgeInsetsMake(0.0f, 0.0f, endFrame.size.height, 0.0f);
     UITextView *textView = [self textView];
     [textView setContentInset:insets];
@@ -148,6 +144,11 @@ CGRect const kInitialViewFrame = { 0.0f, 0.0f, 320.0f, 480.0f };
         [_composeBarView setPlaceholder:@"Type something..."];
         [_composeBarView setUtilityButtonImage:[UIImage imageNamed:@"Camera"]];
         [_composeBarView setDelegate:self];
+
+        [[_composeBarView placeholderLabel] setAccessibilityIdentifier:@"Placeholder"];
+        [[_composeBarView textView] setAccessibilityIdentifier:@"Input"];
+        [[_composeBarView button] setAccessibilityIdentifier:@"Submit"];
+        [[_composeBarView utilityButton] setAccessibilityIdentifier:@"Utility"];
     }
 
     return _composeBarView;
@@ -169,6 +170,7 @@ CGRect const kInitialViewFrame = { 0.0f, 0.0f, 320.0f, 480.0f };
         UIEdgeInsets insets = UIEdgeInsetsMake(0.0f, 0.0f, PHFComposeBarViewInitialHeight, 0.0f);
         [_textView setContentInset:insets];
         [_textView setScrollIndicatorInsets:insets];
+        [_textView setAccessibilityIdentifier:@"Main"];
         [_textView setText:@"Welcome to the Demo!\n\nThis is just some placeholder text to give you a better feeling of how the compose bar can be used along other components."];
 
         UIView *bubbleView = [[UIView alloc] initWithFrame:CGRectMake(80.0f, 480.0f, 220.0f, 60.0f)];
